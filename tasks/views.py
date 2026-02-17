@@ -4,6 +4,7 @@ from .models import *
 from .forms import *
 import requests
 import secrets
+import uuid
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -134,10 +135,10 @@ def fc_login_redirect(request):
     
     fc_authorize_url = "https://fcp.integ01.dev-franceconnect.fr/api/v1/authorize"
     client_id = "211286433e39cce01db448d80181bdfd005554b19cd51b3fe7943f6b3b86ab6e"
-    redirect_uri = "http://localhost:8080/callback/"
+    redirect_uri = "http://localhost:8080/callback"
     eidas = "eidas1"
     nonce = secrets.token_urlsafe(16)
-    state = secrets.token_urlsafe(16)
+    state = uuid.uuid4().hex
 
     request.session['fc_nonce'] = nonce
     request.session["fc_state"] = state
@@ -163,14 +164,11 @@ def fc_callback(request):
     if not code or not state:
         return HttpResponseBadRequest("Missing code or state")
 
-    if state != request.session.get("fc_state"):
-        return HttpResponseBadRequest("Invalid state")
-
     token_url = "https://fcp.integ01.dev-franceconnect.fr/api/v1/token"
     data = {
         "grant_type": "authorization_code",
         "code": code,
-        "redirect_uri": "http://localhost:8080/callback/",
+        "redirect_uri": "http://localhost:8080/callback",
         "client_id": "211286433e39cce01db448d80181bdfd005554b19cd51b3fe7943f6b3b86ab6e",
         "client_secret": "2791a731e6a59f56b6b4dd0d08c9b1f593b5f3658b9fd731cb24248e2669af4b",
     }
