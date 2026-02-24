@@ -1,5 +1,5 @@
-# Image Python 3.14 officielle
-FROM python:3.14
+# Image Python 3.11 officielle
+FROM python:3.11-slim
 
 # Empêche Python de buffer les logs
 ENV PYTHONUNBUFFERED=1
